@@ -1,0 +1,7 @@
+package com.ingenifi
+
+rule "Greeting"
+when
+then
+    insert( new Greeting("classpath") );
+end
