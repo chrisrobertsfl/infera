@@ -1,36 +1,20 @@
 package com.ingenifi
 
 import com.ingenifi.RuleResource.*
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
-import org.kie.api.KieServices
-import org.kie.api.builder.KieBuilder
-import org.kie.api.builder.KieFileSystem
-import org.kie.api.builder.KieRepository
-import org.kie.api.runtime.KieContainer
-import org.kie.api.runtime.KieSession
 import java.util.stream.Stream
 
-@DisplayName("Tests for verifying Engine's rule execution with different RuleResources")
+@DisplayName("Engine rule execution and fact retrieval tests")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EngineTest {
-    companion object {
-        const val STRING_DRL = """
-            package com.ingenifi
-            
-            rule "Greeting"
-            when
-            then
-                insert( new Greeting("string") );
-            end
-        """
-        const val FILE_DRL = "src/test/resources/file.drl"
-        const val CLASSPATH_DRL = "classpath.drl"
-    }
 
     @DisplayName("Given a RuleResource, when engine runs, then it should contain the expected Greeting")
     @ParameterizedTest
@@ -45,6 +29,17 @@ class EngineTest {
 
     @DisplayName("Provider for different types of RuleResources")
     class RuleResourceProvider : ArgumentsProvider {
+        private val STRING_DRL = """
+            package com.ingenifi
+            
+            rule "Greeting"
+            when
+            then
+                insert( new Greeting("string") );
+            end
+        """
+        private val FILE_DRL = "src/test/resources/file.drl"
+        private val CLASSPATH_DRL = "classpath.drl"
         override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
             return Stream.of(
                 Arguments.of(StringResource(STRING_DRL), "string"),
@@ -53,27 +48,43 @@ class EngineTest {
             )
         }
     }
-}
 
-class Engine(private val ruleResources: List<RuleResource>) {
-    private lateinit var session: KieSession
+    @Test
+    @DisplayName("Should insert a single fact successfully during initialization")
+    fun `test successful fact insertion during initialization`() {
+        val engine = Engine(facts = listOf(Greeting("inserted")))
+        val facts = engine.retrieveFacts()
+        assertAll(
+            { assertEquals(1, facts.size, "There should only be one fact inserted") },
+            { assertEquals(Greeting("inserted"), facts[0], "Inserted fact should match the expected fact") }
+        )
+    }
 
-    fun retrieveFacts(predicate: (Any) -> Boolean): List<Any> = session.objects.filter(predicate)
+    @Test
+    @DisplayName("Should insert a single fact successfully during rule execution")
+    fun `test successful fact insertion during rule execution`() {
+        val engine = Engine()
+        val facts = engine.executeRules(listOf(Greeting("inserted"))).retrieveFacts()
+        assertAll(
+            { assertEquals(1, facts.size, "There should only be one fact inserted") },
+            { assertEquals(Greeting("inserted"), facts[0], "Inserted fact should match the expected fact") }
+        )
+    }
 
-    fun executeRules() {
-        val services: KieServices = KieServices.Factory.get()
-        val fileSystem: KieFileSystem = services.newKieFileSystem().apply {
-            ruleResources.map { it.resource }
-                .forEach { write(it) }
-        }
-        val repository: KieRepository = services.repository
-        repository.addKieModule { repository.defaultReleaseId }
-        val builder: KieBuilder = services.newKieBuilder(fileSystem)
-        builder.buildAll()
-        val module = builder.kieModule
-        val container: KieContainer = services.newKieContainer(module.releaseId)
-        session = container.newKieSession()
-        session.fireAllRules()
+    @Test
+    @DisplayName("Should handle no facts being inserted during initialization")
+    fun `test no fact insertion during initialization`() {
+        val engine = Engine()
+        val facts = engine.retrieveFacts()
+        assertTrue(facts.isEmpty(), "No facts should have been inserted")
+    }
+
+    @Test
+    @DisplayName("Should handle no facts being inserted during rule execution")
+    fun `test no fact insertion during rule execution`() {
+        val engine = Engine()
+        val facts = engine.executeRules().retrieveFacts()
+        assertTrue(facts.isEmpty(), "No facts should have been inserted")
     }
 }
 
