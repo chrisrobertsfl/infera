@@ -1,22 +1,18 @@
 package com.ingenifi
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-@DisplayName("Tests for verifying RuleResource implementations")
 class RuleResourceTest {
 
     @Test
-    @DisplayName("Should create StringResource successfully")
-    fun `test StringResource creation`() {
+    fun `Given a valid rule content, when creating a StringResource, then the resource should not be null`() {
         val stringResource = StringResource("rule \"Test\" when then end")
         assertNotNull(stringResource.resource, "StringResource should not be null")
     }
 
     @Test
-    @DisplayName("Should create StringResource with custom target path generator successfully")
-    fun `test StringResource creation with custom target path generator`() {
+    fun `Given a valid rule content and a custom target path generator, when creating a StringResource, then the resource should not be null and the target path should match the custom one provided`() {
         val customTargetPathGenerator: (String) -> String = { _ -> "custom-rule.drl" }
         val stringResource = StringResource("rule \"Test\" when then end", customTargetPathGenerator)
         assertAll(
@@ -25,18 +21,15 @@ class RuleResourceTest {
         )
     }
 
-
     @Test
-    @DisplayName("Should create FileResource successfully when valid file path is provided")
-    fun `test FileResource creation with valid file path`() {
+    fun `Given a valid file path, when creating a FileResource, then the resource should not be null`() {
         val validFilePath = "src/test/resources/test.drl"
         val fileResource = FileResource(validFilePath)
         assertNotNull(fileResource.resource, "FileResource should not be null")
     }
 
     @Test
-    @DisplayName("Should create ClasspathResource successfully when valid classpath is provided")
-    fun `test ClasspathResource creation with valid classpath`() {
+    fun `Given a valid classpath, when creating a ClasspathResource, then the resource should not be null`() {
         val validClasspath = "rules/test.drl"
         val classpathResource = ClasspathResource(validClasspath)
         assertNotNull(classpathResource.resource, "ClasspathResource should not be null")

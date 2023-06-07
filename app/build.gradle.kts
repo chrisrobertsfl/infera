@@ -27,7 +27,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
 
-
     // This dependency is used by the application.
     implementation("com.google.guava:guava:31.1-jre")
 
@@ -36,8 +35,10 @@ dependencies {
     implementation("org.drools:drools-compiler:8.33.0.Final")
     implementation("org.drools:drools-mvel:8.33.0.Final")
 
-    // Add the Commons Lang dependency.
     implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("org.slf4j:slf4j-api:2.0.7")
+    implementation("ch.qos.logback:logback-classic:1.4.7")
+
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -52,7 +53,19 @@ application {
     mainClass.set("com.ingenifi.AppKt")
 }
 
+
 tasks.named<Test>("test") {
+
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+   // systemProperty("logback.configurationFile", "src/test/resources/logback.xml")
+
+
+}
+
+tasks.register("printClasspath") {
+    doLast {
+        configurations["compileClasspath"].forEach { println(it) }
+
+    }
 }

@@ -5,11 +5,13 @@ import org.kie.api.builder.KieBuilder
 import org.kie.api.builder.KieFileSystem
 import org.kie.api.builder.KieRepository
 import org.kie.api.runtime.KieSession
+import org.slf4j.LoggerFactory
 
 /**
  * Engine class responsible for executing rules and retrieving facts.
  */
 class Engine(ruleResources: List<RuleResource> = emptyList(), facts: List<Any> = emptyList()) {
+    private val logger = LoggerFactory.getLogger(Engine::class.java)
     private var session: KieSession
 
     init {
@@ -20,13 +22,15 @@ class Engine(ruleResources: List<RuleResource> = emptyList(), facts: List<Any> =
     fun retrieveFacts(predicate: (Any) -> Boolean = { true }): List<Any> = session.objects.filter(predicate)
 
     fun executeRules(facts: List<Any> = emptyList()): Engine {
+        logger.info("Executing rules")
         insertFacts(facts)
+        session.fireAllRules()
         return this
     }
 
-    private fun insertFacts(facts: List<Any>) {
+    private fun insertFacts(facts: List<Any>) : Engine {
         facts.forEach { session.insert(it) }
-        session.fireAllRules()
+        return this
     }
 
     private fun initializeKieSession(ruleResources: List<RuleResource>): KieSession {
