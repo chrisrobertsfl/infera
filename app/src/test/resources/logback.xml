@@ -5,9 +5,9 @@
         </encoder>
     </appender>
     <logger name="org.drools" level="error" additivity="false">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </logger>
     <root level="debug">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

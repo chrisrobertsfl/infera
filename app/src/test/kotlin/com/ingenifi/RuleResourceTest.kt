@@ -1,37 +1,55 @@
 package com.ingenifi
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
+@DisplayName("RuleResource Tests")
 class RuleResourceTest {
 
-    @Test
-    fun `Given a valid rule content, when creating a StringResource, then the resource should not be null`() {
-        val stringResource = StringResource("rule \"Test\" when then end")
-        assertNotNull(stringResource.resource, "StringResource should not be null")
+    @Nested
+    @DisplayName("StringResource Tests")
+    inner class StringResourceTests {
+
+        @Test
+        fun `valid rule content - not null`() {
+            val stringResource = StringResource("rule \"Test\" when then end")
+            assertNotNull(stringResource.resource)
+        }
+
+        @Test
+        fun `valid rule content, custom target path generator - not null and target path matches custom one`() {
+            val customTargetPathGenerator: (String) -> String = { _ -> "custom-rule.drl" }
+            val stringResource = StringResource("rule \"Test\" when then end", customTargetPathGenerator)
+            assertAll(
+                { assertNotNull(stringResource.resource) },
+                { assertEquals("custom-rule.drl", stringResource.resource.targetPath) }
+            )
+        }
     }
 
-    @Test
-    fun `Given a valid rule content and a custom target path generator, when creating a StringResource, then the resource should not be null and the target path should match the custom one provided`() {
-        val customTargetPathGenerator: (String) -> String = { _ -> "custom-rule.drl" }
-        val stringResource = StringResource("rule \"Test\" when then end", customTargetPathGenerator)
-        assertAll(
-            { assertNotNull(stringResource.resource, "StringResource should not be null") },
-            { assertEquals("custom-rule.drl", stringResource.resource.targetPath, "Target path should match the custom one provided") }
-        )
+    @Nested
+    @DisplayName("FileResource Tests")
+    inner class FileResourceTests {
+
+        @Test
+        fun `valid file path - not null`() {
+            val validFilePath = "src/test/resources/test.drl"
+            val fileResource = FileResource(validFilePath)
+            assertNotNull(fileResource.resource)
+        }
     }
 
-    @Test
-    fun `Given a valid file path, when creating a FileResource, then the resource should not be null`() {
-        val validFilePath = "src/test/resources/test.drl"
-        val fileResource = FileResource(validFilePath)
-        assertNotNull(fileResource.resource, "FileResource should not be null")
-    }
+    @Nested
+    @DisplayName("ClasspathResource Tests")
+    inner class ClasspathResourceTests {
 
-    @Test
-    fun `Given a valid classpath, when creating a ClasspathResource, then the resource should not be null`() {
-        val validClasspath = "rules/test.drl"
-        val classpathResource = ClasspathResource(validClasspath)
-        assertNotNull(classpathResource.resource, "ClasspathResource should not be null")
+        @Test
+        fun `valid classpath - not null`() {
+            val validClasspath = "rules/test.drl"
+            val classpathResource = ClasspathResource(validClasspath)
+            assertNotNull(classpathResource.resource)
+        }
     }
 }

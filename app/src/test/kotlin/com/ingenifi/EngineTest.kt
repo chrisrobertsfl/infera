@@ -3,7 +3,6 @@ package com.ingenifi
 import com.ingenifi.RuleResource.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -13,9 +12,9 @@ import java.util.stream.Stream
 
 class EngineTest {
 
-    @ParameterizedTest(name = "{index} - Given a RuleResource: {0}, when the engine runs, then it should contain the expected Greeting: {1}")
+    @ParameterizedTest(name = "{index} - RuleResource: {0}, Expected Greeting: {1}")
     @ArgumentsSource(RuleResourceProvider::class)
-    fun `Given a RuleResource, when the engine runs, then it should contain the expected Greeting`(ruleResource: RuleResource, name: String) {
+    fun `RuleResource should contain expected Greeting`(ruleResource: RuleResource, name: String) {
         val engine = Engine(ruleResources = listOf(ruleResource))
         engine.executeRules()
         assertTrue(engine.retrieveFacts { it is Greeting }
@@ -46,7 +45,7 @@ class EngineTest {
     }
 
     @Test
-    fun `Given a Greeting fact during initialization, when the engine is created, then it should contain the inserted fact`() {
+    fun `Initialized engine should contain inserted Greeting fact`() {
         val engine = Engine(facts = listOf(Greeting("inserted")))
         val facts = engine.retrieveFacts()
         assertAll(
@@ -55,8 +54,9 @@ class EngineTest {
         )
     }
 
+
     @Test
-    fun `Given a Greeting fact during rule execution, when the engine runs, then it should contain the inserted fact`() {
+    fun `Engine should contain inserted Greeting fact during rule execution`() {
         val engine = Engine()
         val facts = engine.executeRules(listOf(Greeting("inserted"))).retrieveFacts()
         assertAll(
@@ -66,18 +66,19 @@ class EngineTest {
     }
 
     @Test
-    fun `Given no facts during initialization, when the engine is created, then it should contain no facts`() {
+    fun `Engine should contain no facts during initialization`() {
         val engine = Engine()
         val facts = engine.retrieveFacts()
         assertTrue(facts.isEmpty(), "No facts should have been inserted")
     }
 
     @Test
-    fun `Given no facts during rule execution, when the engine runs, then it should contain no facts`() {
+    fun `Engine should contain no facts during rule execution`() {
         val engine = Engine()
         val facts = engine.executeRules().retrieveFacts()
         assertTrue(facts.isEmpty(), "No facts should have been inserted")
     }
+
 }
 
 data class Greeting(val name: String)

@@ -28,7 +28,7 @@ class Engine(ruleResources: List<RuleResource> = emptyList(), facts: List<Any> =
         return this
     }
 
-    private fun insertFacts(facts: List<Any>) : Engine {
+    private fun insertFacts(facts: List<Any>): Engine {
         facts.forEach { session.insert(it) }
         return this
     }
