@@ -10,21 +10,40 @@ import org.slf4j.LoggerFactory
 /**
  * Engine class responsible for executing rules and retrieving facts.
  */
-class Engine(ruleResources: List<RuleResource> = emptyList(), facts: List<Any> = emptyList()) {
-    private val logger = LoggerFactory.getLogger(Engine::class.java)
+class Engine(
+    ruleResources: List<RuleResource> = emptyList(),
+    facts: List<Any> = emptyList(),
+    val options: List<Option> = emptyList()
+) {
+    private var trackingAgendaEventListener: TrackingAgendaEventListener
     private var session: KieSession
+    private val logger = LoggerFactory.getLogger(Engine::class.java)
 
     init {
         session = initializeKieSession(ruleResources)
+        trackingAgendaEventListener = if (options.contains(Option.TRACK_RULES))
+            TrackingAgendaEventListener()
+        else
+            DoNothingAgendaEventListener()
+        session.addEventListener(trackingAgendaEventListener)
         insertFacts(facts)
     }
 
     fun retrieveFacts(predicate: (Any) -> Boolean = { true }): List<Any> = session.objects.filter(predicate)
 
     fun executeRules(facts: List<Any> = emptyList()): Engine {
-        logger.info("Executing rules")
+        logger.debug("Executing rules")
+        trackingAgendaEventListener.let { session.addEventListener(it) }
         insertFacts(facts)
         session.fireAllRules()
+        if (options.contains(Option.TRACK_RULES)) {
+            logger.info("Rules fired:")
+            trackingAgendaEventListener.trackedRules.forEach { it -> logger.info("{}. {}", it.position, it.name) }
+        }
+        if (options.contains(Option.SHOW_FACTS)) {
+            logger.info("Facts:")
+            retrieveFacts().forEach { it -> logger.info(it.toString()) }
+        }
         return this
     }
 
@@ -43,4 +62,5 @@ class Engine(ruleResources: List<RuleResource> = emptyList(), facts: List<Any> =
         val kieBuilder: KieBuilder = kieServices.newKieBuilder(kieFileSystem).apply { buildAll() }
         return kieServices.newKieContainer(kieBuilder.kieModule.releaseId).newKieSession()
     }
+
 }

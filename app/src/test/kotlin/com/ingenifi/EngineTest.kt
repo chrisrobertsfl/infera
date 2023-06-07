@@ -8,9 +8,13 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
+import org.slf4j.LoggerFactory
 import java.util.stream.Stream
 
+
 class EngineTest {
+
+    val logger = LoggerFactory.getLogger(EngineTest::class.java)
 
     @ParameterizedTest(name = "{index} - RuleResource: {0}, Expected Greeting: {1}")
     @ArgumentsSource(RuleResourceProvider::class)
@@ -54,7 +58,6 @@ class EngineTest {
         )
     }
 
-
     @Test
     fun `Engine should contain inserted Greeting fact during rule execution`() {
         val engine = Engine()
@@ -77,6 +80,16 @@ class EngineTest {
         val engine = Engine()
         val facts = engine.executeRules().retrieveFacts()
         assertTrue(facts.isEmpty(), "No facts should have been inserted")
+    }
+
+    @Test
+    fun `Engine should have single fired rule`() {
+        val engine = Engine(
+            ruleResources = listOf(StringResource("rule \"fired\" when then end")),
+            facts = listOf(Greeting("show fact")),
+            options = listOf(Option.TRACK_RULES, Option.SHOW_FACTS)
+        )
+        engine.executeRules()
     }
 
 }
