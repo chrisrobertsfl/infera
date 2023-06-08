@@ -63,4 +63,10 @@ class Engine(
         return kieServices.newKieContainer(kieBuilder.kieModule.releaseId).newKieSession()
     }
 
+    fun firedRules(): List<TrackedRule> = trackingAgendaEventListener.trackedRules
+}
+
+enum class Option {
+    TRACK_RULES,
+    SHOW_FACTS
 }

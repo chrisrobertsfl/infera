@@ -1,6 +1,8 @@
 package com.ingenifi
 
 import com.ingenifi.RuleResource.*
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -53,8 +55,8 @@ class EngineTest {
         val engine = Engine(facts = listOf(Greeting("inserted")))
         val facts = engine.retrieveFacts()
         assertAll(
-            { assertEquals(1, facts.size, "There should only be one fact inserted") },
-            { assertEquals(Greeting("inserted"), facts[0], "Inserted fact should match the expected fact") }
+            { facts.size shouldBe 1 },
+            { facts[0] shouldBe Greeting("inserted") }
         )
     }
 
@@ -63,23 +65,19 @@ class EngineTest {
         val engine = Engine()
         val facts = engine.executeRules(listOf(Greeting("inserted"))).retrieveFacts()
         assertAll(
-            { assertEquals(1, facts.size, "There should only be one fact inserted") },
-            { assertEquals(Greeting("inserted"), facts[0], "Inserted fact should match the expected fact") }
+            { facts.size shouldBe 1 },
+            { facts[0] shouldBe Greeting("inserted") }
         )
     }
 
     @Test
     fun `Engine should contain no facts during initialization`() {
-        val engine = Engine()
-        val facts = engine.retrieveFacts()
-        assertTrue(facts.isEmpty(), "No facts should have been inserted")
+        Engine().retrieveFacts().shouldBeEmpty()
     }
 
     @Test
     fun `Engine should contain no facts during rule execution`() {
-        val engine = Engine()
-        val facts = engine.executeRules().retrieveFacts()
-        assertTrue(facts.isEmpty(), "No facts should have been inserted")
+        Engine().executeRules().retrieveFacts().shouldBeEmpty()
     }
 
     @Test
@@ -89,7 +87,7 @@ class EngineTest {
             facts = listOf(Greeting("show fact")),
             options = listOf(Option.TRACK_RULES, Option.SHOW_FACTS)
         )
-        engine.executeRules()
+        engine.executeRules().firedRules().count() shouldBe 1
     }
 
 }
