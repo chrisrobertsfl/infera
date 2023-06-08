@@ -1,6 +1,6 @@
-package com.ingenifi
+package com.ingenifi.engine
 
-import com.ingenifi.RuleResource.*
+import com.ingenifi.engine.RuleResource.*
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Assertions.*
@@ -30,10 +30,9 @@ class EngineTest {
             .any { it.name == name })
     }
 
-
     class RuleResourceProvider : ArgumentsProvider {
         private val STRING_DRL = """
-            package com.ingenifi
+            package com.ingenifi.engine
             
             rule "Greeting"
             when

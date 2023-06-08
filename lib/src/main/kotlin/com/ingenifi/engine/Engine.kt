@@ -1,4 +1,4 @@
-package com.ingenifi
+package com.ingenifi.engine
 
 import org.kie.api.KieServices
 import org.kie.api.builder.KieBuilder

@@ -1,4 +1,4 @@
-package com.ingenifi
+package com.ingenifi.engine
 
 import org.kie.api.event.rule.*
 

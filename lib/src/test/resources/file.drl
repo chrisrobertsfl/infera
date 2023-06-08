@@ -1,4 +1,4 @@
-package com.ingenifi
+package com.ingenifi.engine
 
 rule "Greeting"
 when

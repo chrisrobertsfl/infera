@@ -10,12 +10,19 @@ plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.8.10"
 
-    // Apply the application plugin to add support for building a CLI application in Java.
-    application
+    // Apply the java-library plugin for API and implementation separation.
+    `java-library`
+    `maven-publish`
+
 }
 
+group = project.findProperty("group") as String? ?: "com.ingenifi"
+version = project.findProperty("version") as String? ?: "1.0.0"
+
+val junitJupiterVersion="5.9.3"
+val kieVersion="8.33.0.Final"
+
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
@@ -24,8 +31,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 
     // Use the JUnit 5 integration.
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testImplementation("io.mockk:mockk:1.13.5")
     testImplementation("io.kotest:kotest-runner-junit5:4.3.2")
 
@@ -33,9 +40,9 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
 
     // Add the Drools dependencies.
-    implementation("org.kie:kie-api:8.33.0.Final")
-    implementation("org.drools:drools-compiler:8.33.0.Final")
-    implementation("org.drools:drools-mvel:8.33.0.Final")
+    implementation("org.kie:kie-api:$kieVersion")
+    implementation("org.drools:drools-compiler:$kieVersion")
+    implementation("org.drools:drools-mvel:$kieVersion")
 
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.slf4j:slf4j-api:2.0.7")
@@ -50,19 +57,10 @@ java {
     }
 }
 
-application {
-    // Define the main class for the application.
-    mainClass.set("com.ingenifi.AppKt")
-}
-
 
 tasks.named<Test>("test") {
-
-    // Use JUnit Platform for unit tests.
     useJUnitPlatform()
    // systemProperty("logback.configurationFile", "src/test/resources/logback.xml")
-
-
 }
 
 tasks.register("printClasspath") {
@@ -71,3 +69,13 @@ tasks.register("printClasspath") {
 
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "infera"
+        }
+    }
+}
+

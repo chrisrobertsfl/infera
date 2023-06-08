@@ -13,4 +13,4 @@ plugins {
 }
 
 rootProject.name = "infera"
-include("app")
+include("lib")
