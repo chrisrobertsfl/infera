@@ -4,6 +4,7 @@ import com.ingenifi.RuleResource.*
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory
 import java.util.stream.Stream
 
 
+@DisplayName("Engine Unit Tests")
 class EngineTest {
 
     val logger = LoggerFactory.getLogger(EngineTest::class.java)
@@ -51,7 +53,7 @@ class EngineTest {
     }
 
     @Test
-    fun `Initialized engine should contain inserted Greeting fact`() {
+    fun `should contain inserted Greeting fact after initialization`() {
         val engine = Engine(facts = listOf(Greeting("inserted")))
         val facts = engine.retrieveFacts()
         assertAll(
@@ -61,7 +63,7 @@ class EngineTest {
     }
 
     @Test
-    fun `Engine should contain inserted Greeting fact during rule execution`() {
+    fun `should contain inserted Greeting fact during rule execution`() {
         val engine = Engine()
         val facts = engine.executeRules(listOf(Greeting("inserted"))).retrieveFacts()
         assertAll(
@@ -71,17 +73,17 @@ class EngineTest {
     }
 
     @Test
-    fun `Engine should contain no facts during initialization`() {
+    fun `should contain no facts during initialization`() {
         Engine().retrieveFacts().shouldBeEmpty()
     }
 
     @Test
-    fun `Engine should contain no facts during rule execution`() {
+    fun `should contain no facts during rule execution`() {
         Engine().executeRules().retrieveFacts().shouldBeEmpty()
     }
 
     @Test
-    fun `Engine should have single fired rule`() {
+    fun `should have single fired rule`() {
         val engine = Engine(
             ruleResources = listOf(StringResource("rule \"fired\" when then end")),
             facts = listOf(Greeting("show fact")),
