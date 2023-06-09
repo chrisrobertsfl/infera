@@ -20,8 +20,7 @@ class TrackingAgendaEventListenerTest {
         every { event.match.rule.name } returns "hello"
         listener.afterMatchFired(event)
         assertAll(
-            { assertEquals(1, listener.numberOfRulesFired) },
-            { listener.numberOfRulesFired shouldBe 1},
+            { listener.trackedRules.size shouldBe 1},
             { listener.trackedRules shouldContainExactly listOf(TrackedRule(1, "hello")) }
         )
     }

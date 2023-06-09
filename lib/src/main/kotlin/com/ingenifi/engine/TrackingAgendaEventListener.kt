@@ -2,10 +2,7 @@ package com.ingenifi.engine
 
 import org.kie.api.event.rule.*
 
-open class TrackingAgendaEventListener(
-    var numberOfRulesFired: Int = 0,
-    var trackedRules: List<TrackedRule> = mutableListOf<TrackedRule>()
-) : AgendaEventListener {
+open class TrackingAgendaEventListener(var trackedRules: List<TrackedRule> = mutableListOf()) : AgendaEventListener {
 
     override fun matchCreated(event: MatchCreatedEvent?) {
     }
@@ -18,9 +15,7 @@ open class TrackingAgendaEventListener(
     }
 
     override fun afterMatchFired(event: AfterMatchFiredEvent?) {
-        numberOfRulesFired += 1
-        val name = event?.match?.rule?.name.orEmpty()
-        trackedRules += TrackedRule(numberOfRulesFired, name)
+        trackedRules += TrackedRule(trackedRules.size + 1, event?.match?.rule?.name.orEmpty())
     }
 
     override fun agendaGroupPopped(event: AgendaGroupPoppedEvent?) {
@@ -45,6 +40,10 @@ open class TrackingAgendaEventListener(
 
     override fun afterRuleFlowGroupDeactivated(event: RuleFlowGroupDeactivatedEvent?) {
         TODO("Not yet implemented")
+    }
+
+    fun clear() {
+        trackedRules = mutableListOf()
     }
 }
 

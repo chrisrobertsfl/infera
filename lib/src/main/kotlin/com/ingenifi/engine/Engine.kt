@@ -31,8 +31,9 @@ class Engine(
 
     fun retrieveFacts(predicate: (Any) -> Boolean = { true }): List<Any> = session.objects.filter(predicate)
 
-    fun clearFacts(): Engine {
+    fun clear(): Engine {
         retrieveFacts().forEach { session.delete(session.getFactHandle(it)) }
+        trackingAgendaEventListener.clear()
         return this
     }
 
