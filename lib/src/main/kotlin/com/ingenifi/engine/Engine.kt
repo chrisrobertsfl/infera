@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
  * Engine class responsible for executing rules and retrieving facts.
  */
 class Engine(
-    ruleResources: List<RuleResource> = emptyList(),
+    var ruleResources: List<RuleResource> = emptyList(),
     facts: List<Any> = emptyList(),
     val options: List<Option> = emptyList()
 ) {
@@ -30,6 +30,11 @@ class Engine(
     }
 
     fun retrieveFacts(predicate: (Any) -> Boolean = { true }): List<Any> = session.objects.filter(predicate)
+
+    fun clearFacts(): Engine {
+        retrieveFacts().forEach { session.delete(session.getFactHandle(it)) }
+        return this
+    }
 
     fun executeRules(facts: List<Any> = emptyList()): Engine {
         logger.debug("Executing rules")
