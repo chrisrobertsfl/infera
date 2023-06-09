@@ -5,6 +5,7 @@
  * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
  * User Manual available at https://docs.gradle.org/8.1.1/userguide/building_java_projects.html
  */
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -18,6 +19,7 @@ plugins {
 
 group = project.findProperty("group") as String? ?: "com.ingenifi"
 version = project.findProperty("version") as String? ?: "1.0.0"
+java.sourceCompatibility = JavaVersion.VERSION_19
 
 val junitJupiterVersion="5.9.3"
 val kieVersion="8.33.0.Final"
@@ -57,6 +59,12 @@ java {
     }
 }
 
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+        jvmTarget = "19"
+    }
+}
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
